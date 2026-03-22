@@ -1,0 +1,20 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.routes.analyze import router as analyze_router
+from app.core.config import settings
+
+app = FastAPI(title="SmartInbox API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.FRONTEND_ORIGIN],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+app.include_router(analyze_router, prefix="/api")
+
+@app.get("/")
+def root():
+    return {"message": "SmartInbox API is running"}
