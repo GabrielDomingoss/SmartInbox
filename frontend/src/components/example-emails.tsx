@@ -45,7 +45,7 @@ export const ExampleEmails = ({ onSelectExample }: IExampleEmailsProps) => {
             key={example.title}
             type="button"
             onClick={() => onSelectExample(example.content)}
-            className="w-full rounded-xl border bg-background p-4 text-left transistion hover:bg-muted/40"
+            className="w-full cursor-pointer rounded-xl border bg-background p-4 text-left transistion hover:-translate-y-0.5 hover:bg-muted/40"
           >
             <div className="space-y-1">
               <div className="flex items-center justify-between gap-3">

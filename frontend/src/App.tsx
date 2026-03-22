@@ -6,21 +6,24 @@ import { EmailInputCard } from "./components/email-input-card";
 import { Alert, AlertDescription, AlertTitle } from "./components/ui/alert";
 import { AnalysisResultCard } from "./components/analysis-result-card";
 import { ExampleEmails } from "./components/example-emails";
-import { UploadSection } from "./components/upload-section";
 import { HistoryList } from "./components/history-list";
+import { useTheme } from "./hooks/use-theme";
+import { ThemeToggle } from "./components/theme-toggle";
 
 const HISTORY_STORAGE_KEY = "smartinbox-history";
 const HISTORY_LIMIT = 5;
 
 function App() {
   const [result, setResult] = useState<IAnalysisResult | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState(false);
+  const [loadingFile, setLoadingFile] = useState(false);
   const [error, setError] = useState("");
   const [selectedExample, setSelectedExample] = useState("");
   const [history, setHistory] = useState<IAnalysisHistoryItem[]>([]);
 
+  const { theme, toggleTheme } = useTheme();
   useEffect(() => {
-    const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+    const storedHistory = sessionStorage.getItem(HISTORY_STORAGE_KEY);
 
     if (!storedHistory) return;
 
@@ -28,13 +31,13 @@ function App() {
       const parsed = JSON.parse(storedHistory) as IAnalysisHistoryItem[];
       setHistory(parsed);
     } catch {
-      localStorage.removeItem(HISTORY_STORAGE_KEY);
+      sessionStorage.removeItem(HISTORY_STORAGE_KEY);
     }
   }, []);
 
   function persistHistory(items: IAnalysisHistoryItem[]) {
     setHistory(items);
-    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(items));
+    sessionStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(items));
   }
 
   function addToHistory(item: IAnalysisHistoryItem) {
@@ -44,7 +47,7 @@ function App() {
 
   async function handleAnalyze(content: string) {
     try {
-      setLoading(true);
+      setLoadingText(true);
       setError("");
 
       const response = await analyzeEmail({ content });
@@ -66,13 +69,13 @@ function App() {
       setError(message);
       setResult(null);
     } finally {
-      setLoading(false);
+      setLoadingText(false);
     }
   }
 
   async function handleAnalyzeFile(file: File) {
     try {
-      setLoading(true);
+      setLoadingFile(true);
       setError("");
       setSelectedExample("");
 
@@ -94,7 +97,7 @@ function App() {
       setError(message);
       setResult(null);
     } finally {
-      setLoading(false);
+      setLoadingFile(false);
     }
   }
 
@@ -112,36 +115,30 @@ function App() {
   return (
     <main className="min-h-screen bg-muted/30">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
-        <header className="space-y-3">
+        <header className="flex items-start justify-between">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold tracking-tight">SmartInbox</h1>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
               Classifique e-mails como produtivos ou improdutivos e gere
               respostas profissionais automaticamente usando IA.
             </p>
+
+            <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-sm text-muted-foreground shadow-sm">
+              <Sparkles className="h-4 w-4" />
+              Classificação inteligente de emails com IA
+            </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-sm text-muted-foreground shadow-sm">
-            <Sparkles className="h-4 w-4" />
-            Classificação inteligente de emails com IA
-          </div>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </header>
-
-        <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid gap-6 xl:grid-cols-2">
           <div className="space-y-6">
             <EmailInputCard
               onAnalyze={handleAnalyze}
-              loading={loading}
+              onFileAnalyze={handleAnalyzeFile}
+              loadingText={loadingText}
+              loadingFile={loadingFile}
               initialContent={selectedExample}
-            />
-
-            <UploadSection loading={loading} onFileSelect={handleAnalyzeFile} />
-
-            <ExampleEmails onSelectExample={handleSelectExample} />
-
-            <HistoryList
-              items={history}
-              onSelectItem={handleSelectHistoryItem}
             />
           </div>
 
@@ -164,6 +161,10 @@ function App() {
             )}
           </div>
         </div>
+
+        <ExampleEmails onSelectExample={handleSelectExample} />
+
+        <HistoryList items={history} onSelectItem={handleSelectHistoryItem} />
       </div>
     </main>
   );

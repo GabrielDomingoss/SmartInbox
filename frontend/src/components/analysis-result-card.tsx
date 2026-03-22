@@ -39,7 +39,12 @@ export const AnalysisResultCard = ({ result }: IAnalysisResultCardProps) => {
               Resposta sugerida
             </p>
 
-            <Button variant="outline" size="sm" onClick={handleCopy}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopy}
+              className="cursor-pointer"
+            >
               {copied ? (
                 <>
                   <Check className="mr-2 h-4 w-4" />

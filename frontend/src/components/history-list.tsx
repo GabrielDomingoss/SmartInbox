@@ -27,7 +27,7 @@ export const HistoryList = ({ items, onSelectItem }: IHistoryListProps) => {
               key={item.id}
               type="button"
               onClick={() => onSelectItem(item)}
-              className="w-full rounded-xl border bg-background p-4 text-left transition hover:bg-muted/40"
+              className="w-full cursor-pointer rounded-xl border bg-background p-4 text-left transition hover:-translate-y-0.5 hover:bg-muted/40"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
