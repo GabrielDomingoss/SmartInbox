@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { IAnalysisHistoryItem, IAnalysisResult } from "./types/analysis";
-import { analyzeEmail, analyzeEmailFile } from "./services/api";
+import { analyzeEmail, analyzeEmailFile } from "./services/analyzer";
 import { AlertCircle, Sparkles } from "lucide-react";
 import { EmailInputCard } from "./components/email-input-card";
 import { Alert, AlertDescription, AlertTitle } from "./components/ui/alert";
@@ -50,7 +50,7 @@ function App() {
       setLoadingText(true);
       setError("");
 
-      const response = await analyzeEmail({ content });
+      const response = await analyzeEmail(content);
       setResult(response);
 
       addToHistory({
