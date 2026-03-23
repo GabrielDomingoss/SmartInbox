@@ -98,7 +98,7 @@ Original email:
         if "429" in message or "RESOURCE_EXHAUSTED" in message:
             raise HTTPException(
                 status_code=429,
-                detail="O limite de uso da IA foi atingido no momento. Tente novamente em amanhã."
+                detail="O serviço de IA está temporariamente indisponível devido ao limite de uso. Tente novamente em instantes."
             )
 
         raise HTTPException(

@@ -112,7 +112,7 @@ export const EmailInputCard = ({
         <Button
           onClick={handleSubmit}
           disabled={loadingText}
-          className="w-full cursor-pointer"
+          className="w-full cursor-pointer hover:opacity-70"
         >
           {loadingText ? (
             <>
