@@ -23,8 +23,8 @@ O SmartInbox automatiza a análise de e-mails corporativos, classificando-os com
 
 ## Deploy
 
-Frontend: https://smartinbox-gabrieldomingoss-projects.vercel.app/
-Backend: https://smartinbox-api.onrender.com/
+- Frontend: https://smartinbox-gabrieldomingoss-projects.vercel.app
+- Backend: https://smartinbox-api.onrender.com/
 
 ## Rodar localmente
 
