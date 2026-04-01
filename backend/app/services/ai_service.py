@@ -9,13 +9,15 @@ logger = logging.getLogger(__name__)
 
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-def fallback_response():
+def fallback_response(reason: str = "indisponível") -> dict:
     return {
         "category": "Unproductive",
-        "reason": "IA temporariamente indisponível",
-        "suggested_response": "Não foi possível analisar o e-mail no momento. Tente novamente em instantes."
+        "reason": f"Análise não realizada: IA {reason}",
+        "suggested_response": (
+            "Não foi possível analisar o e-mail no momento devido a uma instabilidade temporária. "
+            "Por favor, tente novamente em alguns instantes."
+        )
     }
-
 def analyze_email_with_ai(content: str, clean_text: str, keywords: list[str]) -> dict:
     if not settings.GEMINI_API_KEY:
         raise HTTPException(
@@ -110,10 +112,10 @@ Original email:
         logger.error(f"Erro ao analisar email: {message}")
 
         if "429" in message or "RESOURCE_EXHAUSTED" in message:
-            return fallback_response()
+            return fallback_response("com limite de uso atingido")
 
         if "503" in message or "UNAVAILABLE" in message:
-            return fallback_response()
+            return fallback_response("temporariamente indisponível")
         
         raise HTTPException(
             status_code=500,
