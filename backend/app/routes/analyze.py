@@ -4,7 +4,6 @@ from app.services.ai_service import analyze_email_with_ai
 from app.services.file_service import extract_text_from_uploaded_file
 from app.services.nlp_service import preprocess_text
 from app.core.limiter import limiter
-from app.core.security import validate_origin
 import logging
 
 router = APIRouter()
@@ -16,8 +15,7 @@ logger = logging.getLogger(__name__)
 @limiter.limit("5/minute; 10/day")
 def analyze_email(
     request: Request,
-    payload: AnalyzeTextRequest,
-    _: None = Depends(validate_origin)
+    payload: AnalyzeTextRequest
 ):
     logger.info("Recebendo requisição de análise de email por texto")
     content = payload.content.strip()
@@ -58,8 +56,7 @@ def analyze_email(
 @limiter.limit("5/minute; 10/day")
 async def analyze_email_file(
     request: Request,
-    file: UploadFile = File(...),
-    _: None = Depends(validate_origin)
+    file: UploadFile = File(...)
 ):
     logger.info("Recebendo requisição de análise de email por arquivo")
     if not file.filename:
