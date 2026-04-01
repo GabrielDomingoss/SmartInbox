@@ -1,6 +1,11 @@
 from io import BytesIO
 import pdfplumber
 from fastapi import HTTPException, UploadFile
+import logging
+
+MAX_FILE_SIZE = 1 * 1024 * 1024
+MAX_PAGES = 10
+logger = logging.getLogger(__name__)
 
 def extract_text_from_txt(file_bytes: bytes) -> str:
     try:
@@ -16,7 +21,11 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
         text_parts: list[str] = []
         
         with pdfplumber.open(BytesIO(file_bytes)) as pdf:
-            for page in pdf.pages: 
+            for i, page in enumerate(pdf.pages):
+                if i >= MAX_PAGES:
+                    logger.info(f"Limite de páginas atingido: {i}")
+                    break
+
                 page_text = page.extract_text() or ""
                 if page_text.strip():
                     text_parts.append(page_text.strip())
@@ -32,22 +41,25 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
         return full_text
     except HTTPException:
         raise
-    except Exception:
+    except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail="Ocorreu um erro ao processar o arquivo PDF."
+            detail=f"Erro ao processar PDF: {str(e)}"
         )
     
 async def extract_text_from_uploaded_file(file: UploadFile) -> str:
-    filename = file.filename or ""
-    lower_name = filename.lower()
+    file_bytes = await file.read(MAX_FILE_SIZE + 1)
 
-    file_bytes = await file.read()
+    if len(file_bytes) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail="Arquivo muito grande (máx 1MB)"
+        )
     
-    if lower_name.endswith(".txt"):
+    if file.content_type == "application/txt":
         return extract_text_from_txt(file_bytes)
     
-    if lower_name.endswith(".pdf"):
+    if file.content_type == "application/pdf":
         return extract_text_from_pdf(file_bytes)
     
     raise HTTPException(
