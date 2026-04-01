@@ -8,7 +8,7 @@ def validate_origin(request: Request):
 
     allowed = [
         "http://localhost:5173",
-        "https://smartinbox-gabrieldomingoss-projects.vercel.app/"
+        "https://smartinbox-gabrieldomingoss-projects.vercel.app"
     ]
 
     if origin not in allowed:
